@@ -1,0 +1,12 @@
+{
+  "name": "handoff",
+  "owner": { "name": "Nour Shobier" },
+  "description": "Session handoff tools for Claude Code.",
+  "plugins": [
+    {
+      "name": "handoff",
+      "source": "./",
+      "description": "Save, load, deliver and archive session handoffs for Claude Code."
+    }
+  ]
+}
