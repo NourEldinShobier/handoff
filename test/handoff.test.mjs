@@ -1,15 +1,21 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, utimesSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { test } from "node:test";
+import { after, test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const S = join(dirname(fileURLToPath(import.meta.url)), "..", "scripts");
 const run = (script, args = [], opts = {}) =>
   execFileSync("node", [join(S, script), ...args], { encoding: "utf8", ...opts });
-const tmp = () => mkdtempSync(join(tmpdir(), "handoff-test-"));
+const made = [];
+const tmp = () => {
+  const d = mkdtempSync(join(tmpdir(), "handoff-test-"));
+  made.push(d);
+  return d;
+};
+after(() => made.forEach((d) => rmSync(d, { recursive: true, force: true })));
 const git = (cwd, ...a) => execFileSync("git", a, { cwd, encoding: "utf8" });
 
 function repo() {
@@ -110,6 +116,15 @@ test("new-session --dry-run builds a quoted claude command that loads the handof
   assert.equal(o.launched, false);
   assert.equal(o.command, `claude -n "my work" "/handoff:pickup ${f}"`);
   assert.throws(() => run("new-session.mjs", [join(d, "missing.md"), "--dry-run"], { stdio: "pipe" }));
+});
+
+test("new-session mirrors model, effort and permission mode but refuses bypassPermissions", () => {
+  const d = tmp(), f = join(d, "h.md");
+  writeFileSync(f, "x");
+  const o = JSON.parse(run("new-session.mjs", [f, "--cwd", d, "--title", "t", "--model", "claude-sonnet-5-5", "--effort", "high", "--permission-mode", "plan", "--dry-run"]));
+  assert.equal(o.command, `claude -n t --model claude-sonnet-5-5 --effort high --permission-mode plan "/handoff:pickup ${f}"`);
+  for (const bad of [["--permission-mode", "bypassPermissions"], ["--effort", "ultra"]])
+    assert.throws(() => run("new-session.mjs", [f, ...bad, "--dry-run"], { stdio: "pipe" }));
 });
 
 test("session-start hook mentions a fresh handoff, stays silent for old ones and for resume", () => {

@@ -2,7 +2,7 @@
 // Opens a new terminal window running `claude` that starts by loading a handoff.
 // Use it when the desktop app's session tool and SendMessage are not available.
 //
-//   node new-session.mjs <handoff.md> [--cwd DIR] [--title NAME] [--model ID] [--dry-run]
+//   node new-session.mjs <handoff.md> [--cwd DIR] [--title NAME] [--model ID] [--effort LEVEL] [--permission-mode MODE] [--dry-run]
 //
 // Windows opens Windows Terminal (or cmd). macOS and Linux print the command to paste.
 import { spawn } from "node:child_process";
@@ -14,9 +14,9 @@ const val = (n) => {
   const i = argv.indexOf(n);
   return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith("--") ? argv[i + 1] : null;
 };
-const file = argv.find((a, i) => !a.startsWith("--") && !["--cwd", "--title", "--model"].includes(argv[i - 1]));
+const file = argv.find((a, i) => !a.startsWith("--") && !["--cwd", "--title", "--model", "--effort", "--permission-mode"].includes(argv[i - 1]));
 if (!file) {
-  console.error("usage: new-session.mjs <handoff.md> [--cwd DIR] [--title NAME] [--model ID] [--dry-run]");
+  console.error("usage: new-session.mjs <handoff.md> [--cwd DIR] [--title NAME] [--model ID] [--effort LEVEL] [--permission-mode MODE] [--dry-run]");
   process.exit(2);
 }
 const path = resolve(file);
@@ -27,8 +27,21 @@ if (!existsSync(path)) {
 const cwd = resolve(val("--cwd") ?? process.cwd());
 const title = val("--title") ?? "handoff";
 const model = val("--model");
+const effort = val("--effort");
+const mode = val("--permission-mode");
+// Mirroring never raises privilege: bypassPermissions is refused, start it by hand if wanted.
+const EFFORTS = ["low", "medium", "high", "xhigh", "max"];
+const MODES = ["acceptEdits", "auto", "manual", "dontAsk", "plan"];
+if (effort && !EFFORTS.includes(effort)) {
+  console.error(`new-session: --effort must be one of ${EFFORTS.join(", ")}`);
+  process.exit(2);
+}
+if (mode && !MODES.includes(mode)) {
+  console.error(`new-session: --permission-mode must be one of ${MODES.join(", ")} (bypassPermissions is not mirrored)`);
+  process.exit(2);
+}
 
-const args = ["-n", title, ...(model ? ["--model", model] : []), `/handoff:pickup ${path}`];
+const args = ["-n", title, ...(model ? ["--model", model] : []), ...(effort ? ["--effort", effort] : []), ...(mode ? ["--permission-mode", mode] : []), `/handoff:pickup ${path}`];
 const q = (s) => `"${s.replace(/"/g, '\\"')}"`;
 const command = `claude ${args.map((a) => (/[\s"]/.test(a) ? q(a) : a)).join(" ")}`;
 

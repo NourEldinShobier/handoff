@@ -18,7 +18,12 @@ The new session starts with zero context. It gets a pointer message; everything 
 2. **Choose the route.** Take the first that applies:
    - **`to NAME`** given: `ListAgents` to confirm the session exists and is idle, then `SendMessage` to it. Set `delivered_to` in the file's frontmatter to that name.
    - **Claude desktop app** (a `start_session` tool exists, possibly deferred; load it with ToolSearch `select:mcp__ccd_session__start_session`): start a session with `initiation: "user_asked"` (the user just asked), `context: "fresh"`, a short title, the folder this work belongs in, and the message below as the prompt.
-   - **Otherwise, or if `terminal` is in the arguments:** run `node "${CLAUDE_PLUGIN_ROOT}/scripts/new-session.mjs" <file> --cwd <folder> --title "<title>"`. It opens a terminal window running `claude "/handoff:pickup <file>"` (Windows), or prints the command to paste (macOS and Linux). Tell the user which.
+   - **Otherwise, or if `terminal` is in the arguments:** run `node "${CLAUDE_PLUGIN_ROOT}/scripts/new-session.mjs" <file> --cwd <folder> --title "<title>" [--model ID] [--effort LEVEL] [--permission-mode MODE]`. It opens a terminal window running `claude "/handoff:pickup <file>"` (Windows), or prints the command to paste (macOS and Linux). Tell the user which.
+
+   **Mirror this session's settings.** The new session should run the same model, effort and permission mode.
+   - Desktop `start_session`: omit `model`, `effort` and `permission_mode`; omitted means inherited from this session.
+   - Terminal: call `mcp__ccd_session_mgmt__get_session` with `session_id: "self"` if it exists (load it with ToolSearch) and pass its model and effort. Otherwise use the model id from your system prompt and the effort you know of; omit what you do not know. Permission mode: pass `acceptEdits`, `auto`, `dontAsk` or `plan` as is, map `default` to `manual`, and omit `bypassPermissions` (the script refuses it; tell the user to start that by hand if they want it).
+   - `to NAME`: the receiving session keeps its own settings; say so.
 
 3. **Pointer message** (sessions started through a tool or `SendMessage`; keep it under 12 lines, in the agent-to-agent language from the file's Orientation):
    ```

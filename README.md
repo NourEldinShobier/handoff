@@ -53,7 +53,7 @@ All in `scripts/`, plain Node, no dependencies, usable without Claude:
 
 - `collect-state.mjs`: git/env facts as JSON; optional commit and push (never forces; falls back to `handoff/<branch>-<stamp>`).
 - `find-handoffs.mjs`: lists a project's handoffs, newest first.
-- `new-session.mjs`: opens a terminal window with `claude` loading a handoff (Windows Terminal or cmd; prints the command elsewhere).
+- `new-session.mjs`: opens a terminal window with `claude` loading a handoff, optionally with `--model`, `--effort` and `--permission-mode` copied from the old session (Windows Terminal or cmd; prints the command elsewhere). The desktop route inherits them automatically; `bypassPermissions` is never mirrored.
 - `session-start.mjs`: the hook.
 
 ## Not included
