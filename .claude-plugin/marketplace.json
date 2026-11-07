@@ -6,7 +6,7 @@
     {
       "name": "handoff",
       "source": "./",
-      "description": "Save, load, deliver and archive session handoffs for Claude Code."
+      "description": "Save, load and deliver session handoffs for Claude Code."
     }
   ]
 }

@@ -13,13 +13,12 @@ The new session starts with zero context. It gets a pointer message; everything 
 
 ## Steps
 
-1. **Get the file.** If the arguments contain a path to a handoff `.md`, use it. Otherwise follow `/handoff:save` now (same arguments, minus `to`/`new`) and use the path it reports.
+1. **Get the file.** If the arguments contain a path to a handoff `.md`, use it. Otherwise follow `/handoff:save` now (`topic:`, `repo`, `commit`, `push`, focus text) and use the path it reports.
 
 2. **Choose the route.** Take the first that applies:
    - **`to NAME`** given: `ListAgents` to confirm the session exists and is idle, then `SendMessage` to it. Set `delivered_to` in the file's frontmatter to that name.
    - **Claude desktop app** (a `start_session` tool exists, possibly deferred; load it with ToolSearch `select:mcp__ccd_session__start_session`): start a session with `initiation: "user_asked"` (the user just asked), `context: "fresh"`, a short title, the folder this work belongs in, and the message below as the prompt.
    - **Otherwise, or if `terminal` is in the arguments:** run `node "${CLAUDE_PLUGIN_ROOT}/scripts/new-session.mjs" <file> --cwd <folder> --title "<title>"`. It opens a terminal window running `claude "/handoff:pickup <file>"` (Windows), or prints the command to paste (macOS and Linux). Tell the user which.
-   - Same-context copy instead of a cold handoff: say that `/branch` or `claude --resume <id> --fork-session` forks this conversation. Do it only if the user asks.
 
 3. **Pointer message** (sessions started through a tool or `SendMessage`; keep it under 12 lines, in the agent-to-agent language from the file's Orientation):
    ```

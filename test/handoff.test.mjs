@@ -103,33 +103,6 @@ test("find-handoffs lists newest first, filters, and ignores done/", () => {
   assert.deepEqual(f.handoffs.map((h) => h.topic), ["old"]);
 });
 
-test("extract-transcript keeps text, drops tool results, noise and duplicates, splits by day", () => {
-  const dir = tmp(), src = join(dir, "s.jsonl"), out = join(dir, "out");
-  const L = (o) => JSON.stringify(o);
-  writeFileSync(
-    src,
-    [
-      L({ type: "user", uuid: "1", timestamp: "2026-11-06T23:59:00Z", message: { content: "hello <system-reminder>secret rules</system-reminder>" } }),
-      L({ type: "assistant", uuid: "2", timestamp: "2026-11-07T00:01:00Z", message: { content: [{ type: "text", text: "hi there" }, { type: "tool_use", name: "Bash" }] } }),
-      L({ type: "user", uuid: "3", timestamp: "2026-11-07T00:02:00Z", message: { content: [{ type: "tool_result", content: "big" }] } }),
-      L({ type: "user", uuid: "2", timestamp: "2026-11-07T00:03:00Z", message: { content: "repeated after compaction" } }),
-      L({ type: "user", uuid: "4", timestamp: "2026-11-07T00:04:00Z", isMeta: true, message: { content: "meta" } }),
-      L({ type: "user", uuid: "5", timestamp: "2026-11-07T00:05:00Z", message: { content: "<command-name>/x</command-name>" } }),
-    ].join("\n"),
-  );
-  const stats = JSON.parse(run("extract-transcript.mjs", [src, out, "Test"]));
-  assert.deepEqual(stats.days, ["2026-11-06", "2026-11-07"]);
-  assert.equal(stats.user, 1);
-  assert.equal(stats.assistant, 1);
-  assert.equal(stats.duplicates, 1);
-  const d1 = readFileSync(join(out, "2026-11-06.md"), "utf8");
-  assert.match(d1, /## USER · 2026-11-06 23:59\n\nhello\n/);
-  assert.doesNotMatch(d1, /secret rules/);
-  const d2 = readFileSync(join(out, "2026-11-07.md"), "utf8");
-  assert.match(d2, /### ASSISTANT · 2026-11-07 00:01\n\nhi there\n/);
-  assert.doesNotMatch(d2, /big|meta|command-name|repeated/);
-});
-
 test("new-session --dry-run builds a quoted claude command that loads the handoff", () => {
   const d = tmp(), f = join(d, "h h.md");
   writeFileSync(f, "x");
