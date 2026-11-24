@@ -1,7 +1,7 @@
 ---
 name: save
 description: Write a handoff document that lets a fresh Claude session (cold context, any model) continue the current work. Captures the mission, the user's latest request verbatim, state, decisions, dead ends, constraints, open questions and exact next steps, plus git state read from the repo. Optionally commits and pushes first, or puts the file in the repo so another account or machine can pull it. Use when the user says "handoff", "hand off", "save progress", "wrap up this session", "I'm running out of context", "pass this to a new session", or types /handoff:save.
-when_to_use: The context window is filling (about 70-80%), the user is stopping for the day, or work should move to another session, account, machine or agent. To also start the new session, use /handoff:new. To resume, use /handoff:pickup.
+when_to_use: The context window is filling (about 70-80%), the user is stopping for the day, or work should move to another session, account, machine or agent. To resume, use /handoff:pickup.
 argument-hint: "[topic: slug] [repo] [commit] [push] [focus text]"
 ---
 

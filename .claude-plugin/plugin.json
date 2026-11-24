@@ -1,7 +1,7 @@
 {
   "name": "handoff",
-  "version": "0.3.0",
-  "description": "Hand a Claude Code task to a fresh session without losing context: save a handoff document, load it cold, start a new session on it.",
+  "version": "0.4.0",
+  "description": "Hand a Claude Code task to a fresh session without losing context: save a handoff document, and load it cold in a new session.",
   "author": { "name": "Nour Shobier" },
   "homepage": "https://github.com/NourEldinShobier/handoff",
   "repository": "https://github.com/NourEldinShobier/handoff",

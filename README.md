@@ -8,7 +8,6 @@ Claude Code has no single built-in "hand off" command. It has pieces: resume, fo
 |---|---|
 | `/handoff:save` | Writes a handoff document: mission, your latest request verbatim, state, decisions, dead ends, constraints, open questions, exact next steps. Git facts come from a script, not from memory. Optional `commit`, `push`, `repo`. |
 | `/handoff:pickup` | Loads a handoff in a new session, checks the repo for drift, reports the objective and first priority, and starts only after you confirm. |
-| `/handoff:new` | Saves (if needed) and starts the new session for you: through the Claude desktop app's session tool, by messaging an idle running session, or by opening a terminal window with `claude`. |
 
 A `SessionStart` hook adds one line when the project has a handoff saved in the last three days, so the next session offers `/handoff:pickup`. It never loads one by itself.
 
@@ -26,8 +25,6 @@ Restart Claude Code. Needs Node 18 or newer and git on `PATH`.
 ```text
 /handoff:save                      write a handoff for this session
 /handoff:save topic: auth-rewrite push repo
-/handoff:new                       save, then start a new session on it
-/handoff:new to api-worker         send it to a running idle session
 /handoff:pickup                    in the new session: list this project's handoffs
 /handoff:pickup <path>             load a specific file
 ```
@@ -53,7 +50,6 @@ All in `scripts/`, plain Node, no dependencies, usable without Claude:
 
 - `collect-state.mjs`: git/env facts as JSON; optional commit and push (never forces; falls back to `handoff/<branch>-<stamp>`).
 - `find-handoffs.mjs`: lists a project's handoffs, newest first.
-- `new-session.mjs`: opens a terminal window with `claude` loading a handoff, optionally with `--model`, `--effort` and `--permission-mode` copied from the old session (Windows Terminal or cmd; prints the command elsewhere). The desktop route inherits them automatically; `bypassPermissions` is never mirrored.
 - `session-start.mjs`: the hook.
 
 ## Not included
@@ -77,4 +73,4 @@ This repository is also an OpenCode 2 plugin. It registers two skills, `handoff-
 opencode plugin add github:NourEldinShobier/handoff
 ```
 
-Not available in OpenCode: `/handoff:new` (it opens a Claude session) and the SessionStart notice about a recent handoff.
+Not available in OpenCode: the SessionStart notice about a recent handoff.

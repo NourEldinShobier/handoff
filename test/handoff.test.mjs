@@ -109,24 +109,6 @@ test("find-handoffs lists newest first, filters, and ignores done/", () => {
   assert.deepEqual(f.handoffs.map((h) => h.topic), ["old"]);
 });
 
-test("new-session --dry-run builds a quoted claude command that loads the handoff", () => {
-  const d = tmp(), f = join(d, "h h.md");
-  writeFileSync(f, "x");
-  const o = JSON.parse(run("new-session.mjs", [f, "--cwd", d, "--title", "my work", "--dry-run"]));
-  assert.equal(o.launched, false);
-  assert.equal(o.command, `claude -n "my work" "/handoff:pickup ${f}"`);
-  assert.throws(() => run("new-session.mjs", [join(d, "missing.md"), "--dry-run"], { stdio: "pipe" }));
-});
-
-test("new-session mirrors model, effort and permission mode but refuses bypassPermissions", () => {
-  const d = tmp(), f = join(d, "h.md");
-  writeFileSync(f, "x");
-  const o = JSON.parse(run("new-session.mjs", [f, "--cwd", d, "--title", "t", "--model", "claude-sonnet-5-5", "--effort", "high", "--permission-mode", "plan", "--dry-run"]));
-  assert.equal(o.command, `claude -n t --model claude-sonnet-5-5 --effort high --permission-mode plan "/handoff:pickup ${f}"`);
-  for (const bad of [["--permission-mode", "bypassPermissions"], ["--effort", "ultra"]])
-    assert.throws(() => run("new-session.mjs", [f, ...bad, "--dry-run"], { stdio: "pipe" }));
-});
-
 test("session-start hook mentions a fresh handoff, stays silent for old ones and for resume", () => {
   const d = repo(), store = tmp(), env = { ...process.env, HANDOFF_DIR: store };
   const project = JSON.parse(run("collect-state.mjs", ["--cwd", d, "--check"], { env })).project;

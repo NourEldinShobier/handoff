@@ -1,4 +1,4 @@
-// handoff for OpenCode 2: registers /handoff save and pickup. "new" starts a Claude terminal or desktop session, so it stays Claude-only.
+// handoff for OpenCode 2: registers /handoff save and pickup.
 // The SessionStart notice (hooks/hooks.json) has no OpenCode equivalent here yet.
 import { existsSync, readdirSync, readFileSync } from "node:fs"
 import { dirname, join, resolve } from "node:path"
