@@ -68,3 +68,13 @@ claude plugin validate .
 ```
 
 MIT licensed.
+
+## OpenCode
+
+This repository is also an OpenCode 2 plugin. It registers two skills, `handoff-save` and `handoff-pickup`, from the same `skills/` folder; handoffs are stored in `~/.claude/handoffs`, shared with Claude Code.
+
+```sh
+opencode plugin add github:NourEldinShobier/handoff
+```
+
+Not available in OpenCode: `/handoff:new` (it opens a Claude session) and the SessionStart notice about a recent handoff.
